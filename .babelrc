@@ -1,0 +1,12 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+      }
+    ]
+  ],
+  "plugins": [
+    "transform-object-rest-spread" // https://babeljs.io/docs/plugins/transform-object-rest-spread/
+  ]
+}

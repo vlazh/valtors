@@ -1,0 +1,51 @@
+{
+  "name": "valtors",
+  "version": "0.1.0",
+  "description": "ES2015 validation library",
+  "main": "./lib/index.js",
+  "scripts": {
+    "run": "node ./lib/test.js",
+    "clean": "rimraf lib/",
+    "build": "babel src --out-dir lib/ --copy-files",
+    "prepublish": "npm run clean && npm run build",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags",
+    "minor-release": "npm version minor && npm publish && git push --follow-tags",
+    "patch": "npm version patch",
+    "deploy": "npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emsoft/valtors"
+  },
+  "keywords": [
+    "es2015",
+    "validation",
+    "validators",
+    "form",
+    "react",
+    "mobx",
+    "node"
+  ],
+  "contributors": [
+    {
+      "name": "Vladimir Zhukov",
+      "url": "http://github.com/emsoft"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/emsoft/valtors/issues"
+  },
+  "homepage": "https://github.com/emsoft/valtors",
+  "author": "Vladimir Zhukov",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.5.1",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.2.0",
+    "rimraf": "^2.6.1"
+  },
+  "dependencies": {}
+}
