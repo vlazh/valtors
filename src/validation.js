@@ -16,14 +16,17 @@ import {
 
 function propValidatorsName(prop) { return `_${prop}Validators`; }
 
+function orderCompare(a, b) {
+  return (!a.order && 100) - (!b.order && 100);
+}
+
 export function validate(target, propName = null) {
   return (propName ? [propName] : Object.getOwnPropertyNames(target))
       .reduce((acc, prop) => {
         const propValidators = target[propValidatorsName(prop)];
         if (propValidators) {
           const notValid = propValidators
-              .sort((a, b) => a.order - b.order)
-              .reverse()
+              .sort(orderCompare)
               .find(v => !v.validator(target[prop], target, prop));
           acc[prop] = {
             error: notValid && notValid.message.replace(/{PROP}/, prop).replace(/{VALUE}/, target[prop]),
