@@ -2,7 +2,7 @@
   "name": "valtors",
   "version": "0.1.0",
   "description": "ES2015 validation library",
-  "main": "./lib/index.js",
+  "main": "./lib/validation.js",
   "scripts": {
     "run": "node ./lib/test.js",
     "clean": "rimraf lib/",

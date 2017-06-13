@@ -21,7 +21,10 @@ export function validate(target, propName = null) {
       .reduce((acc, prop) => {
         const propValidators = target[propValidatorsName(prop)];
         if (propValidators) {
-          const notValid = propValidators.sort((a, b) => a.order - b.order).find(v => !v.validator(target[prop], target, prop));
+          const notValid = propValidators
+              .sort((a, b) => a.order - b.order)
+              .reverse()
+              .find(v => !v.validator(target[prop], target, prop));
           acc[prop] = {
             error: notValid && notValid.message.replace(/{PROP}/, prop).replace(/{VALUE}/, target[prop]),
           };
