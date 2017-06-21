@@ -5,5 +5,4 @@ node_modules
 .npmignore
 .eslintrc.json
 .babelrc
-package-lock.json
 src
