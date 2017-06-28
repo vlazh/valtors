@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/emsoft/valtors"
+    "url": "https://github.com/vlazh/valtors"
   },
   "keywords": [
     "es2015",
@@ -29,14 +29,14 @@
   "contributors": [
     {
       "name": "Vladimir Zhukov",
-      "url": "http://github.com/emsoft"
+      "url": "http://github.com/vlazh"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/emsoft/valtors/issues"
+    "url": "https://github.com/vlazh/valtors/issues"
   },
-  "homepage": "https://github.com/emsoft/valtors",
+  "homepage": "https://github.com/vlazh/valtors",
   "author": "Vladimir Zhukov",
   "devDependencies": {
     "babel-cli": "^6.24.1",
