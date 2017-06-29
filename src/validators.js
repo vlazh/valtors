@@ -1,3 +1,6 @@
+import { isEmptyObject } from './utils';
+
+
 export function requiredValidator() {
   return (value) => {
     if (value == null) {
@@ -10,7 +13,7 @@ export function requiredValidator() {
       case 'number':
         return isFinite(value);
       case 'object':
-        return !!(Array.isArray(value) ? value.length : Object.keys(value).length);
+        return Array.isArray(value) ? !!value.length : !isEmptyObject(value);
       default:
         return true;
     }
