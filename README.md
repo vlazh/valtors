@@ -81,7 +81,7 @@ class SignIn extends React.Component {
         <div className={styles['container']}>
           <div className={styles['signin-box']}>
             <form onSubmit={this.onSubmit} noValidate>
-              <input value={store.email} onChange={this.onChange} name="username" type="email" placeholder="email">
+              <input value={store.username} onChange={this.onChange} name="username" type="email" placeholder="email">
               <span className={errors.username.error ? styles['error'] : styles['hide']}>{errors.username.error}</span>
 
               <input value={store.password} onChange={this.onChange} name="password" type="password" placeholder="password">
