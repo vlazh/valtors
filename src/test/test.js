@@ -1,6 +1,6 @@
-import { email, required, validate, validatable } from '../validation';
+import { email, required, validatable } from '../validation';
 
-@validatable
+@validatable('validationErrors')
 class AuthCredentials {
 
   @required() @email()

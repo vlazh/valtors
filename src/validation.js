@@ -38,11 +38,25 @@ export function validate(target, propName = null) {
 
 /**
  * Class annotation
- * @param target
+ * @param targetOrProp
  */
-export function validatable(target) {
+export function validatable(targetOrProp) {
   const originalValidate = validate;
-  target.prototype.validate = function validate(prop) { return originalValidate(this, prop); };
+  if (typeof targetOrProp === 'string') {
+    const validationErrorsProperty = targetOrProp;
+    return (target) => {
+      target.prototype.validate = function validate(prop) {
+        if (!(validationErrorsProperty in this)) {
+          Object.defineProperty(this, validationErrorsProperty, { value: {} });
+        }
+        const validationErrors = Object.assign(this[validationErrorsProperty], originalValidate(this, prop));
+        return prop
+            ? !validationErrors[prop].error
+            : Object.getOwnPropertyNames(validationErrors).every(p => !validationErrors[p].error);
+      };
+    };
+  }
+  targetOrProp.prototype.validate = function validate(prop) { return originalValidate(this, prop); };
 }
 
 export function addValidator({ validator, message, order = 0 }) {
