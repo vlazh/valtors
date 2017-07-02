@@ -36,6 +36,15 @@ export function validate(target, propName = null) {
       }, {});
 }
 
+/**
+ * Class annotation
+ * @param target
+ */
+export function validatable(target) {
+  const originalValidate = validate;
+  target.prototype.validate = function validate(prop) { return originalValidate(this, prop); };
+}
+
 export function addValidator({ validator, message, order = 0 }) {
   return (target, name, desc) => {
     const propName = propValidatorsName(name);
