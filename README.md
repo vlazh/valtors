@@ -9,9 +9,10 @@ Perfect worked with React/MobX form validation.
 // Store for react component
 
 import { action, observable } from 'mobx';
-import { email, required, validate } from 'valtors';
+import { email, required, validatable } from 'valtors';
 
 
+@validatable('validationErrors')
 class AuthCredentials {
 
   @required() @email()
@@ -21,14 +22,6 @@ class AuthCredentials {
   @observable password;
 
   @observable validationErrors = { username: {}, password: {} };
-
-  @action
-  validate(prop) {
-    Object.assign(this.validationErrors, validate(this, prop));
-    return prop
-        ? !this.validationErrors[prop].error
-        : Object.getOwnPropertyNames(this.validationErrors).every(p => !this.validationErrors[p].error);
-  }
 }
 
 
