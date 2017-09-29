@@ -1,22 +1,21 @@
-# Output folders
+# Output
 dist/
 build/
 target/
 out/
+classes/
 logs/
 *.log
-lib/
 
 # Temp and caches
 node_modules/
 .cache/
+.awcache/
 tmp
 *~
 
-# IntelliJ IDEA files
+# IDE
 .idea/
 *.iml
-
-# Explicitly include in index
-#!.gitignore
-#!.travis.yml
+.vscode/
+.history/

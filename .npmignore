@@ -1,8 +1,9 @@
-#
-node_modules
-.idea
+.vscode/
+.history/
+.awcache/
+src/
 .gitignore
 .npmignore
-.eslintrc.json
-.babelrc
-src
+tsconfig.json
+tslint.json
+yarn.lock
