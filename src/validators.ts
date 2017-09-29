@@ -14,7 +14,8 @@ export function requiredValidator(): Validator {
       case 'number':
         return isFinite(value);
       case 'object':
-        return Array.isArray(value) ? !!value.length : !isEmptyObject(value);
+        // 'length' in value - for mobx ObservableArrays
+        return Array.isArray(value) || 'length' in value ? !!value.length : !isEmptyObject(value);
       default:
         return true;
     }

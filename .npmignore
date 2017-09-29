@@ -1,6 +1,7 @@
 .vscode/
 .history/
 .awcache/
+.idea/
 src/
 .gitignore
 .npmignore
