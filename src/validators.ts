@@ -1,8 +1,6 @@
 import { isEmptyObject } from './utils';
 
-export interface Validator {
-  (value: any, target?: any, prop?: string): boolean;
-}
+export type Validator = (value: any, target?: any, prop?: string) => boolean;
 
 export function requiredValidator(): Validator {
   return (value: any) => {

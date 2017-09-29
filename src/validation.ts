@@ -121,23 +121,23 @@ export function type(requiredType: any, message?: string) {
   return addValidator({ validator: typeValidator(requiredType), message: msg, order: 2 });
 }
 
-export function min(minValue: any, message?: string) {
-  const msg = (message || messages.Number.min).replace(/{MIN}/, minValue);
+export function min(minValue: number, message?: string) {
+  const msg = (message || messages.Number.min).replace(/{MIN}/, minValue.toString());
   return addValidator({ validator: minValidator(minValue), message: msg });
 }
 
-export function max(maxValue: any, message?: string) {
-  const msg = (message || messages.Number.max).replace(/{MAX}/, maxValue);
+export function max(maxValue: number, message?: string) {
+  const msg = (message || messages.Number.max).replace(/{MAX}/, maxValue.toString());
   return addValidator({ validator: maxValidator(maxValue), message: msg });
 }
 
-export function minLength(minValue: any, message?: string) {
-  const msg = (message || messages.String.minLength).replace(/{MINLENGTH}/, minValue);
+export function minLength(minValue: number, message?: string) {
+  const msg = (message || messages.String.minLength).replace(/{MINLENGTH}/, minValue.toString());
   return addValidator({ validator: minLengthValidator(minValue), message: msg });
 }
 
-export function maxLength(maxValue: any, message?: string) {
-  const msg = (message || messages.String.maxLength).replace(/{MAXLENGTH}/, maxValue);
+export function maxLength(maxValue: number, message?: string) {
+  const msg = (message || messages.String.maxLength).replace(/{MAXLENGTH}/, maxValue.toString());
   return addValidator({ validator: maxLengthValidator(maxValue), message: msg });
 }
 
