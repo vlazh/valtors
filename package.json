@@ -1,6 +1,6 @@
 {
   "name": "valtors",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "JavaScript validation library",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,15 @@
     "type": "git",
     "url": "https://github.com/vlazh/valtors"
   },
-  "keywords": ["es2015", "validation", "validators", "form", "react", "mobx", "node"],
+  "keywords": [
+    "es2015",
+    "validation",
+    "validators",
+    "form",
+    "react",
+    "mobx",
+    "node"
+  ],
   "contributors": [
     {
       "name": "Vladimir Zhukov",
