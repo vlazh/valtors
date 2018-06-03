@@ -25,11 +25,11 @@ export interface ValidationErrors {
 }
 
 export interface Validatable {
-  validate(propName?: string): ValidationErrors;
+  validate(propName?: PropertyKey): ValidationErrors;
 }
 
-function propValidatorsName(prop: string) {
-  return `_${prop}Validators`;
+function propValidatorsName(prop: PropertyKey) {
+  return `_${prop.toString()}Validators`;
 }
 
 function orderCompare(a: ValidableProperty, b: ValidableProperty): number {
@@ -37,7 +37,7 @@ function orderCompare(a: ValidableProperty, b: ValidableProperty): number {
   return (a.order ? a.order : 100) - (b.order ? b.order : 100);
 }
 
-export function validate(target: any, propName?: string): ValidationErrors {
+export function validate(target: any, propName?: PropertyKey): ValidationErrors {
   return (propName ? [propName] : Object.getOwnPropertyNames(target)).reduce((acc, prop) => {
     const propValidators: ValidableProperty[] = target[propValidatorsName(prop)];
     if (propValidators) {
@@ -46,7 +46,8 @@ export function validate(target: any, propName?: string): ValidationErrors {
         .find(v => !v.validator(target[prop], target, prop));
       acc[prop] = {
         error:
-          notValid && notValid.message.replace(/{PROP}/, prop).replace(/{VALUE}/, target[prop]),
+          notValid &&
+          notValid.message.replace(/{PROP}/, prop.toString()).replace(/{VALUE}/, target[prop]),
       };
     }
     return acc;
