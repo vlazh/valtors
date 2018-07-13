@@ -1,10 +1,6 @@
-.vscode/
-.history/
-.awcache/
-.idea/
-src/
-.gitignore
-.npmignore
-tsconfig.json
-tslint.json
-yarn.lock
+/*
+/*/
+!/dist/
+!package.json
+!README.md
+!LICENSE
