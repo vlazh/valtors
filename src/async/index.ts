@@ -1,9 +1,9 @@
-import * as sync from '../validation';
+/* eslint-disable import/prefer-default-export */
+import { validate as validateSync } from '../validation';
 
-const { validate: validateSync /* , ...exporting */ } = sync;
-
-export function validate(target: any, propName?: string) {
+export function validate(
+  target: object,
+  propName?: PropertyKey
+): Promise<ReturnType<typeof validateSync>> {
   return new Promise(resolve => resolve(validateSync(target, propName)));
 }
-// Use commonjs modules for export all form sync but not validate from sync.
-// Object.assign(exports, { validate, ...exporting });

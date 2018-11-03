@@ -1,22 +1,12 @@
 {
+  "extends": "./node_modules/@vzh/configs/ts/dev.tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./src",
-    "outDir": "dist",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "es5",
+    "outDir": "./dist",
     "declaration": true,
-    "sourceMap": false,
-    "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "experimentalDecorators": true,
-    "lib": ["dom", "es5", "es2015"]
+    "sourceMap": false
   },
-  "include": ["./**/*"],
-  "exclude": ["*/test/**"],
+  "include": ["./src/**/*"],
+  // "exclude": ["./src/test/**/*"],
   "files": ["./src/index.ts"]
 }

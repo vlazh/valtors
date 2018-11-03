@@ -1,16 +1,20 @@
 import { email, required, validatable } from '../validation';
 
-@validatable('validationErrors')
+// @validatable('validationErrors')
+@validatable
 class AuthCredentials {
   @required()
   @email()
   username: string = '';
 
-  @required('Password is required') password: string = '';
+  @required('Password is required')
+  password: string = '';
 
   validationErrors = { username: {}, password: {} };
 
-  // validate(prop) {
+  // validate0(prop) {
+  // this
+  // }
   //   Object.assign(this.validationErrors, validate(this, prop));
   //   return prop
   //       ? !this.validationErrors[prop].error

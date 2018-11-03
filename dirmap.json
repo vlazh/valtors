@@ -1,0 +1,12 @@
+{
+  "client": {
+    "root": "",
+
+    "tsconfig": "./tsconfig.json",
+
+    "output": {
+      "root": "",
+      "js": ""
+    }
+  }
+}

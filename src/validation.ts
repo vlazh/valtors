@@ -37,7 +37,7 @@ function orderCompare(a: ValidableProperty, b: ValidableProperty): number {
   return (a.order ? a.order : 100) - (b.order ? b.order : 100);
 }
 
-export function validate(target: any, propName?: PropertyKey): ValidationErrors {
+export function validate(target: object, propName?: PropertyKey): ValidationErrors {
   return (propName ? [propName] : Object.getOwnPropertyNames(target)).reduce((acc, prop) => {
     const propValidators: ValidableProperty[] = target[propValidatorsName(prop)];
     if (propValidators) {
@@ -54,16 +54,20 @@ export function validate(target: any, propName?: PropertyKey): ValidationErrors 
   }, {});
 }
 
-/**
- * Class annotation
- * @param targetOrProp
- */
-// tslint:disable:no-shadowed-variable ban-types
-export function validatable<TP extends Function>(targetOrProp: TP | string): ClassDecorator | any {
+type ValidatableReturnType<TP> = TP extends Function
+  ? (TP & Validatable)
+  : <TFunction extends Function>(target: TFunction) => TFunction & Validatable;
+
+export function validatable<TP extends Function | string>(
+  targetOrProp: TP
+): ValidatableReturnType<TP> {
+  /* eslint-disable no-shadow, no-param-reassign */
   const originalValidate = validate;
+
   if (typeof targetOrProp === 'string') {
     const validationErrorsProperty = targetOrProp;
-    return ((target: TP) => {
+
+    return (target => {
       target.prototype.validate = function validate(prop: string) {
         if (!(validationErrorsProperty in this)) {
           Object.defineProperty(this, validationErrorsProperty, { value: {} });
@@ -77,12 +81,14 @@ export function validatable<TP extends Function>(targetOrProp: TP | string): Cla
           : Object.getOwnPropertyNames(validationErrors).every(p => !validationErrors[p].error);
       };
       return target;
-    }) as ClassDecorator;
+    }) as ValidatableReturnType<TP>;
   }
-  targetOrProp.prototype.validate = function validate(prop: string) {
+
+  (targetOrProp as Function).prototype.validate = function validate(prop: string) {
     return originalValidate(this, prop);
   };
-  return targetOrProp as TP & Validatable;
+
+  return targetOrProp as ValidatableReturnType<TP>;
 }
 
 export function addValidator({
@@ -90,7 +96,7 @@ export function addValidator({
   message,
   order = 0,
 }: ValidableProperty): PropertyDecorator {
-  return (target: any, name: string) => {
+  return (target, name) => {
     const propName = propValidatorsName(name);
     if (!(propName in target)) {
       Object.defineProperty(target, propName, {
@@ -101,7 +107,6 @@ export function addValidator({
       });
     }
     target[propName].push({ validator, message, order });
-    // return desc;
   };
 }
 
@@ -123,27 +128,27 @@ export function type(requiredType: any, message?: string) {
 }
 
 export function min(minValue: number, message?: string) {
-  const msg = (message || messages.Number.min).replace(/{MIN}/, minValue.toString());
+  const msg = (message || messages.number.min).replace(/{MIN}/, minValue.toString());
   return addValidator({ validator: minValidator(minValue), message: msg });
 }
 
 export function max(maxValue: number, message?: string) {
-  const msg = (message || messages.Number.max).replace(/{MAX}/, maxValue.toString());
+  const msg = (message || messages.number.max).replace(/{MAX}/, maxValue.toString());
   return addValidator({ validator: maxValidator(maxValue), message: msg });
 }
 
 export function minLength(minValue: number, message?: string) {
-  const msg = (message || messages.String.minLength).replace(/{MINLENGTH}/, minValue.toString());
+  const msg = (message || messages.string.minLength).replace(/{MINLENGTH}/, minValue.toString());
   return addValidator({ validator: minLengthValidator(minValue), message: msg });
 }
 
 export function maxLength(maxValue: number, message?: string) {
-  const msg = (message || messages.String.maxLength).replace(/{MAXLENGTH}/, maxValue.toString());
+  const msg = (message || messages.string.maxLength).replace(/{MAXLENGTH}/, maxValue.toString());
   return addValidator({ validator: maxLengthValidator(maxValue), message: msg });
 }
 
 export function match(regExp: RegExp, message?: string) {
-  const msg = message || messages.String.match;
+  const msg = message || messages.string.match;
   return addValidator({ validator: matchValidator(regExp), message: msg });
 }
 

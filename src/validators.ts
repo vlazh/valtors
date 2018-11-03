@@ -14,8 +14,7 @@ export function requiredValidator(): Validator {
       case 'number':
         return isFinite(value);
       case 'object':
-        // 'length' in value - for mobx ObservableArrays
-        return Array.isArray(value) || 'length' in value ? !!value.length : !isEmptyObject(value);
+        return Array.isArray(value) ? !!value.length : !isEmptyObject(value);
       default:
         return true;
     }
@@ -38,7 +37,7 @@ export function typeValidator(type: any): Validator {
     }
 
     const typeName = getTypeName(type);
-    const isValid = value instanceof type || typeof value === typeName;
+    const isValid = value instanceof type || typeof value === typeName; // eslint-disable-line valid-typeof
 
     if (isValid) {
       return true;
@@ -101,7 +100,7 @@ export function enumValidator(...enums: any[]): Validator {
 export function emailValidator(): Validator {
   return (value: string) =>
     value == null ||
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
       value
     );
 }
