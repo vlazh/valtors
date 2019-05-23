@@ -1,9 +1,16 @@
 import { isEmptyObject } from './utils';
 
-export type Validator = (value: any, target?: any, prop?: PropertyKey) => boolean;
+type SimpleValidator = (value: unknown) => boolean;
+type ComplexValidator<T extends object> =
+  | ((value: unknown, target: T) => boolean)
+  | ((value: unknown, target: T, prop: keyof T) => boolean);
+export type Validator<T extends object = {}> = SimpleValidator | ComplexValidator<T>;
 
+/**
+ * Returns false for null, undefined, NaN, infinity numbers, empty objects, empty arrays, empty strings.
+ */
 export function requiredValidator(): Validator {
-  return (value: any) => {
+  return (value: unknown) => {
     if (value == null) {
       return false;
     }
@@ -12,95 +19,59 @@ export function requiredValidator(): Validator {
       case 'string':
         return value.length > 0;
       case 'number':
-        return isFinite(value);
+        return Number.isFinite(value);
       case 'object':
-        return Array.isArray(value) ? !!value.length : !isEmptyObject(value);
+        return Array.isArray(value) ? !!value.length : !isEmptyObject(value as object);
       default:
         return true;
     }
   };
 }
 
-export function getTypeName(type: any): string {
-  const typeName =
-    (typeof type === 'function' && type.name.toLowerCase()) || (typeof type === 'string' && type);
-  if (!typeName) {
-    throw new Error(`Wrong type '${type}.'`);
-  }
-  return typeName;
+/**/
+
+export function minValidator(min: number): Validator {
+  return (value: unknown) => value == null || (typeof value === 'number' && value >= min);
 }
 
-export function typeValidator(type: any): Validator {
-  return (value: any) => {
-    if (value == null) {
-      return true;
-    }
-
-    const typeName = getTypeName(type);
-    const isValid = value instanceof type || typeof value === typeName; // eslint-disable-line valid-typeof
-
-    if (isValid) {
-      return true;
-    }
-
-    switch (typeName) {
-      case 'number':
-        return isFinite(+value);
-      case 'boolean': {
-        const str = `${value}`;
-        return str === 'true' || str === 'false' || str === '0' || str === '1';
-      }
-      default:
-        return false;
-    }
-  };
+export function maxValidator(max: number): Validator {
+  return (value: unknown) => value == null || (typeof value === 'number' && value <= max);
 }
 
-/* Number */
+/**/
 
-export function minValidator(min: any): Validator {
-  return (value: any) => +value >= +min;
+export function minLengthValidator(min: number): Validator {
+  return (value: unknown) =>
+    value == null || ((typeof value === 'string' || Array.isArray(value)) && value.length >= min);
 }
 
-export function maxValidator(max: any): Validator {
-  return (value: any) => +value <= +max;
-}
-
-/* End Number */
-
-/* String */
-
-export function minLengthValidator(min: any): Validator {
-  return (value: any) => value == null || value.length >= +min;
-}
-
-export function maxLengthValidator(max: any): Validator {
-  return (value: any) => value == null || value.length <= +max;
+export function maxLengthValidator(max: number): Validator {
+  return (value: unknown) =>
+    value == null || ((typeof value === 'string' || Array.isArray(value)) && value.length <= +max);
 }
 
 export function matchValidator(regExp: RegExp): Validator {
-  return (value: string) => {
-    if (!regExp) {
-      return false;
-    }
-    return value ? regExp.test(value) : true;
-  };
+  return (value: unknown) => value == null || (typeof value === 'string' && regExp.test(value));
 }
 
-/* End String */
+/**/
 
-export function equalsValidator(otherProp: string): Validator {
-  return (value: any, target: any) => value === target[otherProp];
+export function equalsValidator<T extends object>(otherProp: keyof T): Validator<T> {
+  return (value: unknown, target: T) => otherProp in target && value === target[otherProp];
 }
 
-export function enumValidator(...enums: any[]): Validator {
-  return (value: any) => value == null || enums.indexOf(value) >= 0;
+export function enumValidator(...enums: unknown[]): Validator {
+  return (value: unknown) => value == null || enums.indexOf(value) >= 0;
 }
 
 export function emailValidator(): Validator {
-  return (value: string) =>
-    value == null ||
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-      value
-    );
+  return matchValidator(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+}
+
+/** Validates string via Date.parse */
+export function dateStringValidator(): Validator {
+  return (value: unknown) =>
+    value == null || (typeof value === 'string' && Number.isFinite(Date.parse(value)));
 }

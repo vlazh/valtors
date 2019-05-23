@@ -1,9 +1,5 @@
 # Output
 dist/
-build/
-target/
-out/
-classes/
 logs/
 *.log
 
@@ -15,7 +11,5 @@ tmp
 *~
 
 # IDE
-.idea/
-*.iml
 .vscode/
 .history/

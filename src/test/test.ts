@@ -1,29 +1,30 @@
-import { email, required, validatable } from '../validation';
+import { email, required, ValidatorType, equals } from '../validatorsDecorators';
+import validatable from '../validatableDecorator';
 
-// @validatable('validationErrors')
 @validatable
+// @validatable('validationErrors')
 class AuthCredentials {
   @required()
   @email()
   username: string = '';
 
-  @required('Password is required')
+  @required(ValidatorType.ERROR, 'Password is required')
   password: string = '';
 
-  validationErrors = { username: {}, password: {} };
-
-  // validate0(prop) {
-  // this
-  // }
-  //   Object.assign(this.validationErrors, validate(this, prop));
-  //   return prop
-  //       ? !this.validationErrors[prop].error
-  //       : Object.getOwnPropertyNames(this.validationErrors).every(p => !this.validationErrors[p].error);
-  // }
+  @equals('password')
+  password2: string = '';
 }
+
+const A = validatable('err')(AuthCredentials);
+const a = new A();
+console.log(a.validate());
+console.log(a.err);
+console.log(a);
 
 console.log('*******');
 const obj = new AuthCredentials();
-// console.log(obj.validate);
-// console.log(obj.validate());
-console.log(obj.validationErrors);
+obj.password = '123';
+console.log((obj as any).validate());
+console.log((obj as any).err);
+console.log(obj);
+console.log(a);
