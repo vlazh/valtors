@@ -1,96 +1,71 @@
 # Valtors [![npm package](https://img.shields.io/npm/v/valtors.svg?style=flat-square)](https://www.npmjs.org/package/valtors)
 
-**Valtors** is a small flexible extensible validation library for ES2015 classes based on [decorators](https://github.com/tc39/proposal-decorators).
-Perfect worked with React/MobX form validation.
+**Valtors** is a small flexible and extensible validation library for TypeScript/JavaScript. It provides [decorators](https://github.com/tc39/proposal-decorators) for classes and properties. Perfect worked with [MobX](https://mobx.js.org/).
 
-## React/MobX/Valtors Example
+Class decorator `@validatable` injects method `validate(propName?: keyof this)` and property with validation errors (default is `validationErrors`) which will available after `validate` method will be called.
 
-```javascript
+## React + MobX + Valtors Example
+
+```jsx
 // Store for react component
 
 import { action, observable } from 'mobx';
 import { email, required, validatable } from 'valtors';
 
+// @validatable without arguments injects `validationErrors` property for validation errors
+@validatable('errors')
+export default class AuthCredentialsStore {
+  @observable
+  @required()
+  @email()
+  username;
 
-@validatable('validationErrors')
-class AuthCredentials {
-
-  @required() @email()
-  @observable username;
-
+  @observable
   @required('Password is required')
-  @observable password;
+  password;
 
-  @observable validationErrors = { username: {}, password: {} };
+  @action
+  submit() {
+    // Validate all fields.
+    if (!this.validate()) return;
+    // If store is valid submit.
+  }
 }
-
-
-export default AuthCredentials;
-
-
 
 // React component
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useCallback } from 'react';
 import { action } from 'mobx';
-import { inject, observer } from 'mobx-react';
-import styles from './signin.css';
-import AuthCredentials from '../../stores/AuthCredentials';
+import { observer } from 'mobx-react-lite';
+import styles from './SignIn.css';
 
-
-@inject('authCredentials')
-@observer
-class SignIn extends React.Component {
-
-  static propTypes = {
-    authCredentials: PropTypes.instanceOf(AuthCredentials).isRequired,
-  };
-
-  get store() { return this.props.authCredentials; }
-
-  @action
-  onSubmit = (e) => {
+function SignIn({ store }) {
+  const onSubmit = useCallback(action((e) => {
     e.preventDefault();
+    store.submit();
+  }), [store]);
 
-    // Validate all fields.
-    if (!this.store.validate()) { return; }
-
-    // If store is valid submit the form.
-    // ...
-  };
-
-  @action
-  onChange = (e) => {
-    const { name, value } = e.target;
+  const onChange = useCallback(action(({ target: { name, value } }) => {
     store[name] = value;
-    this.store.validate(name); // Validate only one field.
-  }
+    store.validate(name); // Validate only one field.
+  }), [store]);
 
-  render() {
-    const store = this.store;
-    const errors = store.validationErrors;
-    return (
-        <div className={styles['container']}>
-          <div className={styles['signin-box']}>
-            <form onSubmit={this.onSubmit} noValidate>
-              <input value={store.username} onChange={this.onChange} name="username" type="email" placeholder="email">
-              <span className={errors.username.error ? styles['error'] : styles['hide']}>{errors.username.error}</span>
+  const { errors } = store;
+  
+  return (
+    <form onSubmit={onSubmit} noValidate>
+      <input value={store.username} onChange={onChange} name="username" type="email" placeholder="email">
+      <span className={errors.username.error ? styles['error'] : styles['hide']}>{errors.username.error}</span>
 
-              <input value={store.password} onChange={this.onChange} name="password" type="password" placeholder="password">
-              <span className={errors.password.error ? styles['error'] : styles['hide']}>{errors.password.error}</span>
+      <input value={store.password} onChange={onChange} name="password" type="password" placeholder="password">
+      <span className={errors.password.error ? styles['error'] : styles['hide']}>{errors.password.error}</span>
 
-              <button className={styles['btn-login']} type="submit">Login</button>
-            </form>
-          </div>
-        </div>
-    );
-  }
+      <button className={styles['btn-login']} type="submit">Login</button>
+    </form>
+  );
 }
 
-
-export default SignIn;
-
+export default observer(SignIn);
 ```
 
 ## License
