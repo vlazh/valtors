@@ -128,10 +128,10 @@
     lodash.unescape "4.0.1"
     semver "5.5.0"
 
-"@vzh/configs@^3.24.1":
-  version "3.24.1"
-  resolved "https://registry.yarnpkg.com/@vzh/configs/-/configs-3.24.1.tgz#37468e494a2cdc43bb189db35651bd60a343fc25"
-  integrity sha512-N4VUGup9qVmQJT96pCK1MNSvRBJGV5Hl9Uv9dhQOlI1JZnhrug5fdjPUkJdjCyqbD8DzUJSxkNF/PJ8gFmtRHg==
+"@vzh/configs@^3.24.3":
+  version "3.24.3"
+  resolved "https://registry.yarnpkg.com/@vzh/configs/-/configs-3.24.3.tgz#1db9a64509ec5e9f30d65db8d62dc1d63964637a"
+  integrity sha512-lyBuwEXy4uRFHsfH+JdQNyJEaEAzGZgk3t1zrqdq0TEXJyU9wJpU3uc/DVi960uVI9D5O+pDL1dij6XPwDJRAQ==
 
 "@vzh/prettier-config@^1.1.0":
   version "1.1.0"
@@ -1565,10 +1565,10 @@ trim-right@^1.0.1:
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
-ts-node@^8.1.1:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.1.1.tgz#2b9621934a0471f0e13c1b75be54ee0f46c31479"
-  integrity sha512-nd+mdxDP2BjQlyumBCMSU3IQLEjSla1X3uSzDfQ4M5OEZ3iDC01gjhs0FX29jyolATwLKB7YoRJ1Asbxd9EEoA==
+ts-node@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.2.0.tgz#4a89754b00560bb24cd54526e1685fa38c45f240"
+  integrity sha512-m8XQwUurkbYqXrKqr3WHCW310utRNvV5OnRVeISeea7LoCWVcdfeB/Ntl8JYWFh+WRoUAdBgESrzKochQt7sMw==
   dependencies:
     arg "^4.1.0"
     diff "^4.0.1"
@@ -1582,9 +1582,9 @@ tslib@^1.8.1, tslib@^1.9.0:
   integrity sha512-4krF8scpejhaOgqzBEcGM7yDIEfi0/8+8zDRZhNZZ2kjmHJ4hv3zCbQWxoJGz1iw5U0Jl0nma13xzHXcncMavQ==
 
 tsutils@^3.7.0:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-3.10.0.tgz#6f1c95c94606e098592b0dff06590cf9659227d6"
-  integrity sha512-q20XSMq7jutbGB8luhKKsQldRKWvyBO2BGqni3p4yq8Ys9bEP/xQw3KepKmMRt9gJ4lvQSScrihJrcKdKoSU7Q==
+  version "3.13.0"
+  resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-3.13.0.tgz#904ae58d0d81a1d5c16112da7bca059f9283b0e2"
+  integrity sha512-wRtEjVU8Su72sDIDoqno5Scwt8x4eaF0teKO3m4hu8K1QFPnIZMM88CLafs2tapUeWnY9SwwO3bWeOt2uauBcg==
   dependencies:
     tslib "^1.8.1"
 
@@ -1595,10 +1595,10 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typescript@^3.4.5:
-  version "3.4.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.4.5.tgz#2d2618d10bb566572b8d7aad5180d84257d70a99"
-  integrity sha512-YycBxUb49UUhdNMU5aJ7z5Ej2XGmaIBL0x34vZ82fn3hGvD+bgrMrVDpatgz2f7YxUMJxMkbWxJZeAvDxVe7Vw==
+typescript@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.1.tgz#ba72a6a600b2158139c5dd8850f700e231464202"
+  integrity sha512-64HkdiRv1yYZsSe4xC1WVgamNigVYjlssIoaH2HcZF0+ijsk5YK2g0G34w9wJkze8+5ow4STd22AynfO6ZYYLw==
 
 uri-js@^4.2.2:
   version "4.2.2"
