@@ -33,7 +33,7 @@ export function getPropValidatorsName(): string {
   return `__validators__`;
 }
 
-type TypedPropertyDecorator<T extends object = {}> = (
+export type TypedPropertyDecorator<T extends object = {}> = (
   target: T,
   key: never extends T ? string : keyof T
 ) => void;
