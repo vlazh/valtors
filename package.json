@@ -32,9 +32,11 @@
     "node"
   ],
   "scripts": {
+    "update-deps": "yarn upgrade-interactive --latest",
     "clean": "rimraf dist/*",
     "copy:configs": "copyfiles package.json README.md LICENSE .npmignore ./dist/",
     "build": "npm run clean && tsc --project ./tsconfig.json && npm run copy:configs",
+    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/valtors/' && copyfiles package.json '/home/vladimir/dev/sources/tutoron/node_modules/valtors/'",
     "manual-test": "npm run build && node ./dist/test/test.js",
     "patch-publish": "npm version patch && npm run build && npm publish ./dist/ && git push --follow-tags",
     "minor-publish": "npm version minor && npm run build && npm publish ./dist/ && git push --follow-tags",
@@ -43,11 +45,11 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
-    "@vzh/configs": "^3.37.0",
+    "@vzh/configs": "^3.37.1",
     "babel-eslint": "^10.0.2",
     "copyfiles": "^2.1.1",
     "eslint": "^6.1.0",
-    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-prettier": "^3.1.0",
