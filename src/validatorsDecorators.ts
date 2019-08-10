@@ -69,6 +69,12 @@ export function addValidator<T extends object>({
   };
 }
 
+export function compose(...decorators: TypedPropertyDecorator[]): TypedPropertyDecorator {
+  return (target, name) => {
+    decorators.forEach(v => v(target, name));
+  };
+}
+
 export function required(
   type: ValidatorType = ValidatorType.ERROR,
   message: string = messages.required
