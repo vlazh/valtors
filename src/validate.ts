@@ -24,11 +24,13 @@ function orderCompare<T extends object>(a: ValidableProperty<T>, b: ValidablePro
 }
 
 /**
- * Validates all properties of object @param target or just property @param propName
+ * Validates all properties of object `target` or just property `propName`.
+ * If `testValue` is provided then it used in validation instead of `target[propName]`
  */
-export default function validate<T extends object>(
+export default function validate<T extends object, K extends keyof T>(
   target: T,
-  propName?: keyof T
+  propName?: K,
+  testValue?: T[K]
 ): ValidationErrors<T> {
   return (propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[])).reduce<
     ValidationErrors<T>
@@ -37,15 +39,18 @@ export default function validate<T extends object>(
     const propValidators = validators[prop];
 
     if (propValidators) {
+      const isTest = propName && arguments.length >= 3;
+      const propValue = isTest ? testValue : target[prop];
+
       const notValid = propValidators
         .sort(orderCompare)
-        .find(v => !v.validator(target[prop], target, prop));
+        .find(v => !v.validator(propValue, target, prop));
 
       acc[prop] = notValid
         ? {
             error: notValid.message
               .replace(/{PROP}/, prop.toString())
-              .replace(/{VALUE}/, String(target[prop])),
+              .replace(/{VALUE}/, String(propValue)),
             type: notValid.type,
           }
         : {};
