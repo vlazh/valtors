@@ -26,7 +26,7 @@ function createNewTarget<T extends Function>(target: T, validationErrorsProperty
       this: typeof target['prototype'],
       propName?: keyof typeof target['prototype']
     ): boolean {
-      if (!(validationErrorsProperty in this)) {
+      if (!(validationErrorsProperty in (this as object))) {
         Object.defineProperty(this, validationErrorsProperty, {
           writable: true,
           enumerable: true,
