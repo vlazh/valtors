@@ -32,22 +32,21 @@
     "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/valtors/' && copyfiles package.json '/home/vladimir/dev/sources/tutoron/node_modules/valtors/'",
     "manual-test": "npm run build && node ./dist/test/test.js",
     "patch-publish": "npm run build && npm version patch && npm run copy:configs && npm publish ./dist/ && git push origin master --follow-tags",
-    "minor-publish": "npm run build && npm version minor && npm run copy:configs && npm publish ./dist/ && git push origin master --follow-tags",
-    "major-publish": "npm run build && npm version major && npm run copy:configs && npm publish ./dist/ && git push origin master --follow-tags"
+    "minor-publish": "npm run build && npm version minor && npm run copy:configs && npm publish ./dist/ && git push origin master --follow-tags"
   },
   "devDependencies": {
-    "@js-toolkit/configs": "^3.46.0",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.17.0",
+    "@js-toolkit/configs": "^3.77.2",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^7.21.0",
+    "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.3.1",
-    "prettier": "^2.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.0",
     "rimraf": "^3.0.2",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
   }
 }
