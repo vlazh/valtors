@@ -1,60 +1,77 @@
-import {
-  ValidableProperty,
-  getPropValidatorsName,
-  Validators,
-  ValidatorType,
-} from './validatorsDecorators';
+import type { ValidatorConfig, Validator } from './validators';
 
-export type ValidationResult =
-  | {
-      error: string;
-      type: ValidatorType;
-    }
-  | {
-      error?: never;
-      type?: never;
-    };
+export type ValidationInfo = ExcludeTypes<ValidatorConfig<any>, AnyFunction>;
 
-export type ValidationErrors<T extends object> = { [P in keyof T]?: ValidationResult };
+export type ValidationResult<
+  Props extends PropertyKey,
+  R extends ValidationInfo | EmptyObject = ValidationInfo | EmptyObject
+> = {
+  readonly [P in Props]?: R;
+};
 
-function orderCompare<T extends object>(a: ValidableProperty<T>, b: ValidableProperty<T>): number {
-  return (
-    (a.order ? a.order : Number.MAX_SAFE_INTEGER) - (b.order ? b.order : Number.MAX_SAFE_INTEGER)
-  );
+export type PropsValidators<T extends AnyObject> = {
+  readonly [P in keyof T]?: Validator | Validator[];
+};
+
+export interface ValidateOptions<T extends AnyObject, K extends keyof T = never> {
+  readonly validators?: PropsValidators<T>;
+  readonly testValue?: T[K];
 }
 
+// function orderCompare<T extends AnyObject>(
+//   a: ValidatableProperty<T>,
+//   b: ValidatableProperty<T>
+// ): number {
+//   return (
+//     (a.order ? a.order : Number.MAX_SAFE_INTEGER) - (b.order ? b.order : Number.MAX_SAFE_INTEGER)
+//   );
+// }
+
 /**
- * Validates all properties of object `target` or just property `propName`.
- * If `testValue` is provided then it used in validation instead of `target[propName]`
+ * Validates all properties of the `target` or just the property `propName`.
+ * If the `testValue` is provided it will be used instead of `target[propName]`
  */
-export default function validate<T extends object, K extends keyof T>(
+export function validate<T extends AnyObject, K extends keyof T>(
   target: T,
   propName?: K,
-  testValue?: T[K]
-): ValidationErrors<T> {
-  return (propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[])).reduce<
-    ValidationErrors<T>
-  >((acc, prop) => {
-    const validators: Validators<T> = target[getPropValidatorsName()] || {};
-    const propValidators = validators[prop];
+  options: ValidateOptions<T, K> = {}
+): ValidationResult<keyof T> {
+  const props = propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[]);
+  return props.reduce((acc, prop) => {
+    const targetValidators =
+      options.validators ?? (target[validate.getValidatorsPropName()] as PropsValidators<T>) ?? {};
+    const propValidators = (
+      Array.isArray(targetValidators[prop])
+        ? targetValidators[prop]
+        : targetValidators[prop] && [targetValidators[prop]]
+    ) as Extract<typeof targetValidators[typeof prop], unknown[]> | undefined;
 
     if (propValidators) {
-      const isTest = propName && arguments.length >= 3;
-      const propValue = isTest ? testValue : target[prop];
+      const isTest = propName && 'testValue' in options;
+      const propValue = isTest ? options.testValue : target[prop];
 
-      const notValid = propValidators
-        .sort(orderCompare)
-        .find(v => !v.validator(propValue, target, prop));
+      const failed = propValidators
+        // .sort(orderCompare)
+        .find((v) => !v.assertion(propValue, target, prop));
 
-      acc[prop] = notValid
-        ? {
-            error: notValid.message
-              .replace(/{PROP}/, prop.toString())
-              .replace(/{VALUE}/, String(propValue)),
-            type: notValid.type,
-          }
+      acc[prop] = failed
+        ? ((): ValidationInfo => {
+            const { type, message, assertion, ...rest } = failed;
+            return {
+              message: (typeof message === 'function' ? message(propValue, target, prop) : message)
+                .replace(/{PROP}/, prop.toString())
+                .replace(/{VALUE}/, String(propValue)),
+              type,
+              ...rest,
+            };
+          })()
         : {};
     }
     return acc;
-  }, {});
+  }, {} as Writeable<ValidationResult<keyof T>>);
 }
+
+/** Name of special field for validators. */
+validate.getValidatorsPropName = (): string => {
+  return `__validators__`;
+};

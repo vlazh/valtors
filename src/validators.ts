@@ -1,77 +1,158 @@
-import { isEmptyObject } from './utils';
+import type { GetOverridedKeys } from '@js-toolkit/utils/types/augmentation';
+import messages from './messages';
+import * as assertions from './assertions';
 
-type SimpleValidator = (value: unknown) => boolean;
-type ComplexValidator<T extends object> =
-  | ((value: unknown, target: T) => boolean)
-  | ((value: unknown, target: T, prop: keyof T) => boolean);
-export type Validator<T extends object = {}> = SimpleValidator | ComplexValidator<T>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ValidatorTypes {}
 
-/**
- * Returns false for null, undefined, NaN, infinity numbers, empty objects, empty arrays, empty strings.
- */
-export function requiredValidator(): Validator {
-  return (value: unknown) => {
-    if (value == null) {
-      return false;
-    }
+export type ValidatorType = GetOverridedKeys<'error' | 'warn' | 'info', ValidatorTypes>;
 
-    switch (typeof value) {
-      case 'string':
-        return value.length > 0;
-      case 'number':
-        return Number.isFinite(value);
-      case 'object':
-        return Array.isArray(value) ? !!value.length : !isEmptyObject(value as object);
-      default:
-        return true;
-    }
-  };
+export type ValueAssertion<V = unknown> = (value: V) => boolean;
+
+export type TargetValueAssertion<T extends AnyObject, V = unknown> = (
+  value: V,
+  target: T,
+  prop: keyof T
+) => boolean;
+
+type MessageBuilder<A extends ValueAssertion<any> | TargetValueAssertion<any, any>> = (
+  ...args: Parameters<A>
+) => string;
+
+export interface ValidatorConfig<A extends ValueAssertion<any> | TargetValueAssertion<any, any>> {
+  readonly type: ValidatorType;
+  readonly message: string | MessageBuilder<A>;
+  readonly valid?: boolean;
 }
 
-/**/
-
-export function minValidator(min: number): Validator {
-  return (value: unknown) => value == null || (typeof value === 'number' && value >= min);
+export interface Validator<
+  A extends ValueAssertion<any> | TargetValueAssertion<any, any> =
+    | ValueAssertion<any>
+    | TargetValueAssertion<any, any>
+> extends ValidatorConfig<A> {
+  readonly assertion: A;
 }
 
-export function maxValidator(max: number): Validator {
-  return (value: unknown) => value == null || (typeof value === 'number' && value <= max);
+export type ValidatorOptions<A extends ValueAssertion<any> | TargetValueAssertion<any, any>> =
+  Partial<ValidatorConfig<A>>;
+
+function getMessageText<A extends ValueAssertion<any> | TargetValueAssertion<any, any>>(
+  message: NonNullable<ValidatorOptions<A>['message']>,
+  ...params: Parameters<MessageBuilder<A>>
+): string {
+  return typeof message === 'function' ? message(...params) : message;
 }
 
-/**/
-
-export function minLengthValidator(min: number): Validator {
-  return (value: unknown) =>
-    value == null || ((typeof value === 'string' || Array.isArray(value)) && value.length >= min);
+export function required({
+  type = 'error',
+  message = messages.required,
+  ...rest
+}: ValidatorOptions<ValueAssertion<unknown>> = {}): Validator<ValueAssertion<unknown>> {
+  return { assertion: assertions.required(), type, message, ...rest };
 }
 
-export function maxLengthValidator(max: number): Validator {
-  return (value: unknown) =>
-    value == null || ((typeof value === 'string' || Array.isArray(value)) && value.length <= +max);
+export function min(
+  minValue: number,
+  {
+    type = 'error',
+    message = messages.number.min,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<number>> = {}
+): Validator<ValueAssertion<number>> {
+  const msg: MessageBuilder<ValueAssertion<number>> = (...params): string =>
+    getMessageText<ValueAssertion<number>>(message, ...params).replace(
+      /{MIN}/,
+      minValue.toString()
+    );
+  return { assertion: assertions.min(minValue), type, message: msg, ...rest };
 }
 
-export function matchValidator(regExp: RegExp): Validator {
-  return (value: unknown) => value == null || (typeof value === 'string' && regExp.test(value));
+export function max(
+  maxValue: number,
+  {
+    type = 'error',
+    message = messages.number.max,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<number>> = {}
+): Validator<ValueAssertion<number>> {
+  const msg: MessageBuilder<ValueAssertion<number>> = (...params) =>
+    getMessageText(message, ...params).replace(/{MAX}/, maxValue.toString());
+  return { assertion: assertions.max(maxValue), type, message: msg, ...rest };
 }
 
-/**/
-
-export function equalsValidator<T extends object>(otherProp: keyof T): Validator<T> {
-  return (value: unknown, target: T) => otherProp in target && value === target[otherProp];
+export function minLength(
+  minValue: number,
+  {
+    type = 'error',
+    message = messages.string.minLength,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<number>> = {}
+): Validator<ValueAssertion<number>> {
+  const msg: MessageBuilder<ValueAssertion<number>> = (...params) =>
+    getMessageText(message, ...params).replace(/{MINLENGTH}/, minValue.toString());
+  return { assertion: assertions.minLength(minValue), type, message: msg, ...rest };
 }
 
-export function enumValidator(...enums: unknown[]): Validator {
-  return (value: unknown) => value == null || enums.indexOf(value) >= 0;
+export function maxLength(
+  maxValue: number,
+  {
+    type = 'error',
+    message = messages.string.maxLength,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<number>> = {}
+): Validator<ValueAssertion<number>> {
+  const msg: MessageBuilder<ValueAssertion<number>> = (...params) =>
+    getMessageText(message, ...params).replace(/{MAXLENGTH}/, maxValue.toString());
+  return { assertion: assertions.maxLength(maxValue), type, message: msg, ...rest };
 }
 
-export function emailValidator(): Validator {
-  return matchValidator(
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  );
+export function match(
+  regExp: RegExp,
+  {
+    type = 'error',
+    message = messages.string.match,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<string>> = {}
+): Validator<ValueAssertion<string>> {
+  return { assertion: assertions.match(regExp), type, message, ...rest };
 }
 
-/** Validates string via Date.parse */
-export function dateStringValidator(): Validator {
-  return (value: unknown) =>
-    value == null || (typeof value === 'string' && Number.isFinite(Date.parse(value)));
+export function oneOf(
+  list: unknown[],
+  {
+    type = 'error',
+    message = messages.oneOf,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<unknown>> = {}
+): Validator<ValueAssertion<unknown>> {
+  return { assertion: assertions.oneOf(...list), type, message, ...rest };
+}
+
+export function email({
+  type = 'error',
+  message = messages.email,
+  ...rest
+}: ValidatorOptions<ValueAssertion<string>> = {}): Validator<ValueAssertion<string>> {
+  return { assertion: assertions.email(), type, message, ...rest };
+}
+
+export function propEquals<T extends AnyObject>(
+  otherProp: keyof T,
+  {
+    type = 'error',
+    message = messages.equals,
+    ...rest
+  }: ValidatorOptions<ValueAssertion<unknown>> = {}
+): Validator<TargetValueAssertion<T, unknown>> {
+  const msg: MessageBuilder<ValueAssertion<unknown>> = (...params) =>
+    getMessageText(message, ...params).replace(/{PROP2}/, String(otherProp));
+  return { assertion: assertions.equals(otherProp), type, message: msg, ...rest };
+}
+
+export function dateString({
+  type = 'error',
+  message = messages.dateString,
+  ...rest
+}: ValidatorOptions<ValueAssertion<string>> = {}): Validator<ValueAssertion<string>> {
+  return { assertion: assertions.dateString(), type, message, ...rest };
 }

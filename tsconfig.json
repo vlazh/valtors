@@ -2,13 +2,14 @@
   "extends": "@js-toolkit/configs/ts/common.tsconfig.json",
   "compilerOptions": {
     "isolatedModules": false,
-    "baseUrl": "./src",
     "outDir": "./dist",
-    "declaration": true,
+    "baseUrl": "./src",
     "sourceMap": false,
-    "incremental": false
+    "declaration": true,
+    "incremental": true,
+    "diagnostics": true
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/"],
   // "exclude": ["./src/test/**/*"],
   "files": ["./src/index.ts"]
 }

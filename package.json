@@ -15,38 +15,41 @@
     "url": "https://github.com/vlazh/valtors/issues"
   },
   "keywords": [
-    "javascript",
     "validation",
-    "js validation",
-    "javascript validation",
+    "validate",
     "validators",
-    "form",
-    "react",
-    "mobx",
-    "node"
+    "form validation",
+    "react validation",
+    "mobx validation",
+    "javascript validation",
+    "typescript validation"
   ],
   "scripts": {
     "clean": "rimraf dist/*",
     "copy:configs": "copyfiles package.json README.md LICENSE .npmignore ./dist/",
-    "build": "npm run clean && tsc --project ./tsconfig.json",
-    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '/home/vladimir/dev/sources/tutoron/node_modules/valtors/' && copyfiles package.json '/home/vladimir/dev/sources/tutoron/node_modules/valtors/'",
-    "manual-test": "npm run build && node ./dist/test/test.js",
-    "patch-publish": "npm run build && npm version patch && npm run copy:configs && npm publish ./dist/ && git push origin master --follow-tags",
-    "minor-publish": "npm run build && npm version minor && npm run copy:configs && npm publish ./dist/ && git push origin master --follow-tags"
+    "minify": "node-utils-minify --replace ./dist",
+    "build": "yarn run clean && tsc --project ./tsconfig.json",
+    "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '../../../tutoron/node_modules/valtors/' && copyfiles package.json '../../../tutoron/node_modules/valtors/'",
+    "build-to-player": "tsc --build ./tsconfig.json && yarn run minify && copyfiles -e './dist/*(package.json|README.md|LICENSE)' -e './dist/test/*' -u 1 './dist/**/*' '../../../player/modules/valtors'",
+    "manual-test": "yarn run build && node ./dist/test/test.js",
+    "patch-publish": "yarn run build && yarn run minify && yarn version --patch && yarn run copy:configs && npm publish ./dist/ && git push --follow-tags",
+    "minor-publish": "yarn run build && yarn run minify && yarn version --minor && yarn run copy:configs && npm publish ./dist/ && git push --follow-tags"
   },
   "devDependencies": {
-    "@js-toolkit/configs": "^3.77.2",
-    "@typescript-eslint/eslint-plugin": "^4.25.0",
-    "@typescript-eslint/parser": "^4.25.0",
+    "@js-toolkit/configs": "^3.83.2",
+    "@js-toolkit/node-utils": "^1.1.4",
+    "@js-toolkit/utils": "^1.40.2",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
     "copyfiles": "^2.4.1",
-    "eslint": "^7.27.0",
-    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint": "^8.7.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.3",
-    "eslint-plugin-prettier": "^3.4.0",
-    "prettier": "^2.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.0.0",
-    "typescript": "^4.3.2"
+    "terser": "^5.10.0",
+    "typescript": "^4.5.4"
   }
 }

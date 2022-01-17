@@ -1,3 +1,3 @@
-export * from './validatorsDecorators';
-export { default as validate } from './validate';
+export * from './validators';
 export * from './validate';
+export * from './validatable';
