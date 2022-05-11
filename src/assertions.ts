@@ -1,4 +1,4 @@
-import isEmptyObject from '@js-toolkit/utils/isEmptyObject';
+import isEmptyObject from '@jstoolkit/utils/isEmptyObject';
 import type { TargetValueAssertion, ValueAssertion } from './validators';
 
 /** Returns false for null, undefined, NaN, infinity numbers, empty objects, empty arrays, empty strings. */

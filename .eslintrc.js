@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  extends: require.resolve('@js-toolkit/configs/eslint/common'),
+  extends: require.resolve('@jstoolkit/configs/eslint/common'),
 };
