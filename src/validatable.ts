@@ -23,7 +23,7 @@ type Remap<T extends { __prop_map__: string }, V> = {
 
 export type ValidatableObject<T extends AnyObject, ResultProp extends string> = T &
   Remap<{ __prop_map__: ResultProp }, ValidationResult<keyof T>> & {
-    validate(propName?: keyof T): boolean;
+    validate(propName?: keyof T | undefined): boolean;
   };
 
 export type Validatable<T extends AnyObject, ResultProp extends string> = T extends Function
@@ -35,7 +35,7 @@ const defaultValidationResultProperty: DefaultValidationResultProperty = 'valida
 
 export interface ValidatableOptions<T extends AnyObject, RP extends string>
   extends ValidateOptions<T> {
-  readonly resultProp?: RP;
+  readonly resultProp?: RP | undefined;
 }
 
 export function validatable<
@@ -60,7 +60,7 @@ export function validatable<
       writable: true,
     });
 
-    Ctor.prototype.validate = function (this: T, propName?: keyof T): boolean {
+    Ctor.prototype.validate = function (this: T, propName?: keyof T | undefined): boolean {
       const validationResult = {
         ...this[resultProp],
         ...originalValidate(this, propName, rest),

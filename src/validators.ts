@@ -22,7 +22,7 @@ type MessageBuilder<A extends ValueAssertion<any> | TargetValueAssertion<any, an
 export interface ValidatorConfig<A extends ValueAssertion<any> | TargetValueAssertion<any, any>> {
   readonly type: ValidatorType;
   readonly message: string | MessageBuilder<A>;
-  readonly valid?: boolean;
+  readonly valid?: boolean | undefined;
 }
 
 export interface Validator<

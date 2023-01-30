@@ -6,7 +6,7 @@ export type ValidationResult<
   Props extends PropertyKey,
   R extends ValidationInfo | EmptyObject = ValidationInfo | EmptyObject
 > = {
-  readonly [P in Props]?: R;
+  readonly [P in Props]?: R | undefined;
 };
 
 export type PropsValidators<T extends AnyObject> = {
@@ -14,8 +14,8 @@ export type PropsValidators<T extends AnyObject> = {
 };
 
 export interface ValidateOptions<T extends AnyObject, K extends keyof T = never> {
-  readonly validators?: PropsValidators<T>;
-  readonly testValue?: T[K];
+  readonly validators?: PropsValidators<T> | undefined;
+  readonly testValue?: T[K] | undefined;
 }
 
 // function orderCompare<T extends AnyObject>(
@@ -33,7 +33,7 @@ export interface ValidateOptions<T extends AnyObject, K extends keyof T = never>
  */
 export function validate<T extends AnyObject, K extends keyof T>(
   target: T,
-  propName?: K,
+  propName?: K | undefined,
   options: ValidateOptions<T, K> = {}
 ): ValidationResult<keyof T> {
   const props = propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[]);
