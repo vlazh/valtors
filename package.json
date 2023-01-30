@@ -32,26 +32,26 @@
     "build-to-tutoron": "tsc --project ./tsconfig.json --outDir '../../../tutoron/node_modules/valtors/' && copyfiles package.json '../../../tutoron/node_modules/valtors/'",
     "build-to-player": "tsc --build ./tsconfig.json && yarn run minify && copyfiles -e './dist/*(package.json|README.md|LICENSE)' -e './dist/test/*' -u 1 './dist/**/*' '../../../player/modules/valtors'",
     "manual-test": "yarn run build && node ./dist/test/test.js",
-    "patch-publish": "yarn run build && yarn run minify && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push --follow-tags",
-    "minor-publish": "yarn run build && yarn run minify && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push --follow-tags"
+    "patch-publish": "yarn run build && yarn run minify && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push origin master --follow-tags",
+    "minor-publish": "yarn run build && yarn run minify && npm version minor --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push origin master --follow-tags"
   },
   "optionalDependencies": {
     "@js-toolkit/node-utils": "^1.1.4"
   },
   "devDependencies": {
-    "@jstoolkit/configs": "^3.84.7",
-    "@jstoolkit/utils": "^1.45.6",
-    "@typescript-eslint/eslint-plugin": "^5.43.0",
-    "@typescript-eslint/parser": "^5.43.0",
+    "@jstoolkit/configs": "^3.85.0",
+    "@jstoolkit/utils": "^1.46.1",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.27.0",
+    "eslint": "^8.33.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "terser": "^5.15.1",
-    "typescript": "^4.9.3"
+    "prettier": "^2.8.3",
+    "rimraf": "^4.1.2",
+    "terser": "^5.16.1",
+    "typescript": "^4.9.4"
   }
 }
