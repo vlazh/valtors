@@ -44,7 +44,7 @@ export function validate<T extends AnyObject, K extends keyof T>(
       Array.isArray(targetValidators[prop])
         ? targetValidators[prop]
         : targetValidators[prop] && [targetValidators[prop]]
-    ) as Extract<typeof targetValidators[typeof prop], unknown[]> | undefined;
+    ) as Extract<(typeof targetValidators)[typeof prop], unknown[]> | undefined;
 
     if (propValidators) {
       const isTest = propName && 'testValue' in options;

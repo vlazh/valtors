@@ -5,7 +5,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/ban-types */
-import { validate as originalValidate, ValidationResult, ValidateOptions } from './validate';
+import {
+  validate as originalValidate,
+  type ValidationResult,
+  type ValidateOptions,
+} from './validate';
 
 export type ValidatableConstructor<T extends Function, ResultProp extends string> = {
   prototype: Pick<Validatable<T['prototype'], ResultProp>, 'validate'>;

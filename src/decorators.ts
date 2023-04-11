@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { validate } from './validate';
 import {
-  DefaultValidationResultProperty,
+  type DefaultValidationResultProperty,
+  type ValidatableConstructor,
+  type ValidatableOptions,
   validatable as validatableFn,
-  ValidatableConstructor,
-  ValidatableOptions,
 } from './validatable';
 import type { PropsValidators } from './validate';
 import * as valtors from './validators';

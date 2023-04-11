@@ -14,7 +14,7 @@ export function required(): ValueAssertion {
       case 'number':
         return Number.isFinite(value);
       case 'object':
-        return Array.isArray(value) ? !!value.length : !isEmptyObject(value as object);
+        return Array.isArray(value) ? !!value.length : !isEmptyObject(value);
       default:
         return true;
     }
