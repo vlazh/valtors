@@ -44,7 +44,7 @@ export interface ValidatableOptions<T extends AnyObject, RP extends string>
 
 export function validatable<
   T extends AnyObject,
-  RP extends string = DefaultValidationResultProperty
+  RP extends string = DefaultValidationResultProperty,
 >(
   target: T,
   { resultProp = defaultValidationResultProperty as RP, ...rest }: ValidatableOptions<T, RP> = {}

@@ -17,7 +17,7 @@ export type TypedPropertyDecorator<T extends AnyObject = AnyObject> = (
 
 type ValidatableDecorator<
   T extends Function | ValidatableOptions<any, RP>,
-  RP extends string
+  RP extends string,
 > = T extends Function
   ? ValidatableConstructor<T, DefaultValidationResultProperty>
   : <F extends Function>(target: F) => ValidatableConstructor<F, RP>;

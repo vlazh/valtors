@@ -29,7 +29,7 @@ export interface ValidatorConfig<A extends ValueAssertion<any> | TargetValueAsse
 export interface Validator<
   A extends ValueAssertion<any> | TargetValueAssertion<any, any> =
     | ValueAssertion<any>
-    | TargetValueAssertion<any, any>
+    | TargetValueAssertion<any, any>,
 > extends ValidatorConfig<A> {
   readonly assertion: A;
 }

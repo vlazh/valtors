@@ -4,7 +4,7 @@ export type ValidationInfo = ExcludeTypes<ValidatorConfig<any>, AnyFunction>;
 
 export type ValidationResult<
   Props extends PropertyKey,
-  R extends ValidationInfo | EmptyObject = ValidationInfo | EmptyObject
+  R extends ValidationInfo | EmptyObject = ValidationInfo | EmptyObject,
 > = {
   readonly [P in Props]?: R | undefined;
 };
@@ -37,38 +37,46 @@ export function validate<T extends AnyObject, K extends keyof T>(
   options: ValidateOptions<T, K> = {}
 ): ValidationResult<keyof T> {
   const props = propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[]);
-  return props.reduce((acc, prop) => {
-    const targetValidators =
-      options.validators ?? (target[validate.getValidatorsPropName()] as PropsValidators<T>) ?? {};
-    const propValidators = (
-      Array.isArray(targetValidators[prop])
-        ? targetValidators[prop]
-        : targetValidators[prop] && [targetValidators[prop]]
-    ) as Extract<(typeof targetValidators)[typeof prop], unknown[]> | undefined;
+  return props.reduce(
+    (acc, prop) => {
+      const targetValidators =
+        options.validators ??
+        (target[validate.getValidatorsPropName()] as PropsValidators<T>) ??
+        {};
+      const propValidators = (
+        Array.isArray(targetValidators[prop])
+          ? targetValidators[prop]
+          : targetValidators[prop] && [targetValidators[prop]]
+      ) as Extract<(typeof targetValidators)[typeof prop], unknown[]> | undefined;
 
-    if (propValidators) {
-      const isTest = propName && 'testValue' in options;
-      const propValue = isTest ? options.testValue : target[prop];
+      if (propValidators) {
+        const isTest = propName && 'testValue' in options;
+        const propValue = isTest ? options.testValue : target[prop];
 
-      const failed = propValidators
-        // .sort(orderCompare)
-        .find((v) => !v.assertion(propValue, target, prop));
+        const failed = propValidators
+          // .sort(orderCompare)
+          .find((v) => !v.assertion(propValue, target, prop));
 
-      acc[prop] = failed
-        ? ((): ValidationInfo => {
-            const { type, message, assertion, ...rest } = failed;
-            return {
-              message: (typeof message === 'function' ? message(propValue, target, prop) : message)
-                .replace(/{PROP}/, prop.toString())
-                .replace(/{VALUE}/, String(propValue)),
-              type,
-              ...rest,
-            };
-          })()
-        : {};
-    }
-    return acc;
-  }, {} as Writeable<ValidationResult<keyof T>>);
+        acc[prop] = failed
+          ? ((): ValidationInfo => {
+              const { type, message, assertion, ...rest } = failed;
+              return {
+                message: (typeof message === 'function'
+                  ? message(propValue, target, prop)
+                  : message
+                )
+                  .replace(/{PROP}/, prop.toString())
+                  .replace(/{VALUE}/, String(propValue)),
+                type,
+                ...rest,
+              };
+            })()
+          : {};
+      }
+      return acc;
+    },
+    {} as Writeable<ValidationResult<keyof T>>
+  );
 }
 
 /** Name of special field for validators. */

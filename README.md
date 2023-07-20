@@ -51,7 +51,7 @@ function SignIn({ store }) {
   }), [store]);
 
   const { errors } = store;
-  
+
   return (
     <form onSubmit={onSubmit} noValidate>
       <input value={store.username} onChange={onChange} name="username" type="email" placeholder="email">
