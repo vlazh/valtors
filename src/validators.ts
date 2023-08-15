@@ -1,4 +1,4 @@
-import type { GetOverridedKeys } from '@jstoolkit/utils/types/augmentation';
+import type { GetOverridedKeys } from '@js-toolkit/utils/types/augmentation';
 import messages from './messages';
 import * as assertions from './assertions';
 
