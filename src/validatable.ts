@@ -103,9 +103,9 @@ export function validatable<
       const validationResult = {
         ...this[resultProp],
         ...validateFn(this, propName, rest),
-      } as ValidationResult<keyof T>;
+      } as ValidationResult<keyof T> & T[RP];
 
-      this[resultProp] = validationResult as T[RP];
+      this[resultProp] = validationResult;
 
       return propName
         ? !!validationResult[propName]?.valid || !validationResult[propName]?.message
