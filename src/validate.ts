@@ -4,17 +4,17 @@ export type ValidationInfo = ExcludeTypes<ValidatorConfig<any>, AnyFunction>;
 
 export type ValidationResult<
   Props extends PropertyKey,
-  R extends ValidationInfo | EmptyObject = ValidationInfo | EmptyObject,
+  R extends ValidationInfo = ValidationInfo,
 > = {
-  readonly [P in Props]?: R | undefined;
+  readonly [P in Props]: R | undefined;
 };
 
-export type PropsValidators<T extends AnyObject> = {
-  readonly [P in keyof T]?: Validator | Validator[];
+type PropsValidators<T extends AnyObject> = {
+  [P in keyof T]?: Validator | Validator[] | undefined;
 };
 
 export interface ValidateOptions<T extends AnyObject, K extends keyof T = never> {
-  readonly validators?: PropsValidators<T> | undefined;
+  readonly validators?: PropsValidators<T extends AnyConstructor ? InstanceType<T> : T> | undefined;
   readonly testValue?: T[K] | undefined;
 }
 
@@ -37,12 +37,13 @@ export function validate<T extends AnyObject, K extends keyof T>(
   options: ValidateOptions<T, K> = {}
 ): ValidationResult<keyof T> {
   const props = propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[]);
+  const targetValidators =
+    options.validators ??
+    (target as Record<symbol, PropsValidators<T>>)[validate.getValidatorsPropName()] ??
+    {};
+
   return props.reduce(
     (acc, prop) => {
-      const targetValidators =
-        options.validators ??
-        (target[validate.getValidatorsPropName()] as PropsValidators<T>) ??
-        {};
       const propValidators = (
         Array.isArray(targetValidators[prop])
           ? targetValidators[prop]
@@ -57,21 +58,19 @@ export function validate<T extends AnyObject, K extends keyof T>(
           // .sort(orderCompare)
           .find((v) => !v.assertion(propValue, target, prop));
 
-        acc[prop] = failed
-          ? ((): ValidationInfo => {
-              const { type, message, assertion, ...rest } = failed;
-              return {
-                message: (typeof message === 'function'
-                  ? message(propValue, target, prop)
-                  : message
-                )
-                  .replace(/{PROP}/, prop.toString())
-                  .replace(/{VALUE}/, String(propValue)),
-                type,
-                ...rest,
-              };
-            })()
-          : {};
+        if (failed) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { type, message, assertion, ...rest } = failed;
+          acc[prop] = {
+            message: (typeof message === 'function' ? message(propValue, target, prop) : message)
+              .replace(/{PROP}/, prop.toString())
+              .replace(/{VALUE}/, String(propValue)),
+            type,
+            ...rest,
+          } as Writeable<ValidationResult<keyof T>>[typeof prop];
+        } else {
+          acc[prop] = undefined as Writeable<ValidationResult<keyof T>>[typeof prop];
+        }
       }
       return acc;
     },
@@ -80,6 +79,6 @@ export function validate<T extends AnyObject, K extends keyof T>(
 }
 
 /** Name of special field for validators. */
-validate.getValidatorsPropName = (): string => {
-  return `__validators__`;
+validate.getValidatorsPropName = (): symbol => {
+  return Symbol.for(`@@__validators__`);
 };

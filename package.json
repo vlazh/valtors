@@ -28,8 +28,8 @@
     "clean": "rimraf dist/*",
     "copy:configs": "copyfiles package.json README.md LICENSE .npmignore ./dist/",
     "minify": "node-utils-minify --replace ./dist",
-    "build": "yarn run clean && tsc --project ./tsconfig.json",
-    "manual-test": "yarn run build && node ./dist/test/test.js",
+    "build": "yarn run clean && tsc --build ./tsconfig.json",
+    "manual-test": "yarn run build && node --experimental-modules ./dist/test/test.js",
     "patch-publish": "yarn run build && yarn run minify && npm version patch --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push origin master --follow-tags",
     "minor-publish": "yarn run build && yarn run minify && npm version minor --no-workspaces-update -m 'v%s' && yarn run copy:configs && cd ./dist && npm publish --access public && git push origin master --follow-tags"
   },
@@ -37,19 +37,18 @@
     "@js-toolkit/node-utils": "^1.1.4"
   },
   "devDependencies": {
-    "@js-toolkit/configs": "^3.87.5",
-    "@js-toolkit/utils": "^1.49.1",
-    "@typescript-eslint/eslint-plugin": "^6.4.0",
-    "@typescript-eslint/parser": "^6.4.0",
+    "@js-toolkit/configs": "^3.88.1",
+    "@js-toolkit/utils": "^1.49.6",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.47.0",
+    "eslint": "^8.53.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.28.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "prettier": "^3.0.1",
-    "rimraf": "^5.0.1",
-    "terser": "^5.19.2",
-    "typescript": "^5.1.6"
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.0",
+    "terser": "^5.24.0",
+    "typescript": "^5.2.2"
   }
 }

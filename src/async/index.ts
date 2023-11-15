@@ -1,12 +1,13 @@
-import { validate as validateSync } from '../validate';
+import { validate as validateSync, type ValidateOptions } from '../validate';
 
 export * from '../index';
 
-export function validate<T extends object>(
+export function validate<T extends AnyObject, K extends keyof T>(
   target: T,
-  propName?: keyof T | undefined
+  propName?: K | undefined,
+  options: ValidateOptions<T, K> = {}
 ): Promise<ReturnType<typeof validateSync>> {
   return new Promise((resolve) => {
-    resolve(validateSync(target, propName));
+    resolve(validateSync(target, propName, options));
   });
 }

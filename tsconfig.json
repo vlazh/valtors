@@ -1,15 +1,28 @@
 {
   "extends": "@js-toolkit/configs/ts/common.tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "outDir": "dist",
+    "baseUrl": "src",
     "exactOptionalPropertyTypes": true,
     "sourceMap": false,
     "declaration": true,
     "incremental": true,
     "diagnostics": true
   },
-  "include": ["./src/"],
+  "include": ["src"],
   // "exclude": ["./src/test/**/*"],
-  "files": ["./src/index.ts"]
+  "files": ["src/index.ts"],
+  "ts-node": {
+    "transpileOnly": true,
+    // "esm": true,
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "module": "CommonJS",
+      // "moduleResolution": "Node",
+      "allowJs": true,
+      "incremental": false,
+      "importHelpers": false,
+      "declaration": false
+    }
+  }
 }

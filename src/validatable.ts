@@ -1,21 +1,14 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable func-names */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/ban-types */
-import {
-  validate as originalValidate,
-  type ValidationResult,
-  type ValidateOptions,
-} from './validate';
+import { validate as validateFn, type ValidationResult, type ValidateOptions } from './validate';
 
-export type ValidatableConstructor<T extends Function, ResultProp extends string> = {
-  prototype: Pick<Validatable<T['prototype'], ResultProp>, 'validate'>;
-} & (T extends AnyConstructor
-  ? { new (...args: ConstructorParameters<T>): Validatable<T['prototype'], ResultProp> }
-  : { new (): Validatable<T['prototype'], ResultProp> });
+export interface ValidatableConstructor<T extends AnyConstructor, ResultProp extends string> {
+  readonly prototype: WithIndex<T>['prototype'] &
+    Pick<ValidatableObject<InstanceType<T>, ResultProp>, 'validate'>;
+  // readonly [Symbol.species]: T;
+  new (...args: ConstructorParameters<T>): ValidatableObject<InstanceType<T>, ResultProp>;
+}
+// (T extends AnyConstructor
+//   ? { new (...args: ConstructorParameters<T>): Validatable<T['prototype'], ResultProp> }
+//   : { new (): Validatable<T['prototype'], ResultProp> });
 
 // Hack:
 // For instance: createStore(validatable()) - in this case ResultProp is a string because the object
@@ -30,7 +23,7 @@ export type ValidatableObject<T extends AnyObject, ResultProp extends string> = 
     validate(propName?: keyof T | undefined): boolean;
   };
 
-export type Validatable<T extends AnyObject, ResultProp extends string> = T extends Function
+export type Validatable<T extends AnyObject, ResultProp extends string> = T extends AnyConstructor
   ? ValidatableConstructor<T, ResultProp>
   : ValidatableObject<T, ResultProp>;
 
@@ -46,40 +39,61 @@ export function validatable<
   T extends AnyObject,
   RP extends string = DefaultValidationResultProperty,
 >(
-  target: T,
+  target: /* T extends AnyConstructor ? T : */ T & ThisType<Validatable<T, RP>>,
   { resultProp = defaultValidationResultProperty as RP, ...rest }: ValidatableOptions<T, RP> = {}
 ): Validatable<T, RP> {
   // Class
   if (target instanceof Function) {
-    type I = Validatable<{}, RP>;
+    const Base = target as T & AnyConstructor;
+    return class extends Base {
+      constructor(...args: unknown[]) {
+        super(...args);
+        this[resultProp] = {} as (typeof this)[RP];
+      }
 
-    const Ctor = function (this: I, ...params: unknown[]) {
-      target.call(this, ...params);
-      this[resultProp] = {} as I[RP];
-    };
-    Ctor.prototype = Object.create(target.prototype);
-    Object.defineProperty(Ctor.prototype, 'constructor', {
-      value: Ctor,
-      enumerable: false,
-      writable: true,
-    });
+      validate(this: T, propName?: keyof T | undefined): boolean {
+        const validationResult = {
+          ...this[resultProp],
+          ...validateFn(this, propName, rest),
+        };
 
-    Ctor.prototype.validate = function (this: T, propName?: keyof T | undefined): boolean {
-      const validationResult = {
-        ...this[resultProp],
-        ...originalValidate(this, propName, rest),
-      };
+        this[resultProp] = validationResult;
 
-      this[resultProp] = validationResult;
+        return propName
+          ? !validationResult[propName]?.message
+          : Object.getOwnPropertyNames(validationResult).every(
+              (p) => !validationResult[p as keyof typeof validationResult]?.message
+            );
+      }
+    } as Validatable<T, RP>;
 
-      return propName
-        ? !validationResult[propName]?.message
-        : Object.getOwnPropertyNames(validationResult).every(
-            (p) => !validationResult[p as keyof typeof validationResult]?.message
-          );
-    };
+    // const Ctor = function (this: Validatable<AnyObject, RP>, ...params: unknown[]): void {
+    //   target.call(this, ...params);
+    //   this[resultProp] = {} as (typeof this)[RP];
+    // };
+    // Ctor.prototype = Object.create(target.prototype);
+    // Object.defineProperty(Ctor.prototype, 'constructor', {
+    //   value: Ctor,
+    //   enumerable: false,
+    //   writable: true,
+    // });
 
-    return Ctor as unknown as Validatable<T, RP>;
+    // Ctor.prototype.validate = function (this: T, propName?: keyof T | undefined): boolean {
+    //   const validationResult = {
+    //     ...this[resultProp],
+    //     ...validateFn(this, propName, rest),
+    //   };
+
+    //   this[resultProp] = validationResult;
+
+    //   return propName
+    //     ? !validationResult[propName]?.message
+    //     : Object.getOwnPropertyNames(validationResult).every(
+    //         (p) => !validationResult[p as keyof typeof validationResult]?.message
+    //       );
+    // };
+
+    // return Ctor as unknown as Validatable<T, RP>;
   }
 
   return Object.assign(target, {
@@ -88,7 +102,7 @@ export function validatable<
     validate(this: T, propName: keyof T) {
       const validationResult = {
         ...this[resultProp],
-        ...originalValidate(this, propName, rest),
+        ...validateFn(this, propName, rest),
       } as ValidationResult<keyof T>;
 
       this[resultProp] = validationResult as T[RP];

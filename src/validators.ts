@@ -2,7 +2,6 @@ import type { GetOverridedKeys } from '@js-toolkit/utils/types/augmentation';
 import messages from './messages';
 import * as assertions from './assertions';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ValidatorTypes {}
 
 export type ValidatorType = GetOverridedKeys<'error' | 'warn' | 'info', ValidatorTypes>;
@@ -137,15 +136,15 @@ export function email({
   return { assertion: assertions.email(), type, message, ...rest };
 }
 
-export function propEquals<T extends AnyObject>(
-  otherProp: keyof T,
+export function propEquals<T extends AnyObject, K extends keyof T>(
+  otherProp: K,
   {
     type = 'error',
     message = messages.equals,
     ...rest
-  }: ValidatorOptions<ValueAssertion<unknown>> = {}
-): Validator<TargetValueAssertion<T, unknown>> {
-  const msg: MessageBuilder<ValueAssertion<unknown>> = (...params) =>
+  }: ValidatorOptions<ValueAssertion<T[K]>> = {}
+): Validator<TargetValueAssertion<T, T[K]>> {
+  const msg: MessageBuilder<ValueAssertion<T[K]>> = (...params) =>
     getMessageText(message, ...params).replace(/{PROP2}/, String(otherProp));
   return { assertion: assertions.equals(otherProp), type, message: msg, ...rest };
 }

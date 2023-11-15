@@ -1,8 +1,7 @@
-import { email, required, propEquals } from '../decorators';
+import { email, required, propEquals, validatable as validatableDec } from '../decorators';
 import { validatable } from '../validatable';
 
-// @validatable.decorator({ resultProp: 'aaa' })
-// @validatable.decorator
+@validatableDec({})
 class AuthCredentials {
   @required()
   @email()
@@ -17,7 +16,9 @@ class AuthCredentials {
   constructor(readonly a: number) {}
 }
 
-const AAA = validatable(AuthCredentials, { resultProp: 'err' });
+// type A = Validatable<typeof AuthCredentials, 'aaa'>['prototype']['']
+
+const AAA = validatable(AuthCredentials, { resultProp: 'err', validators: {} });
 const a = new AAA(0);
 console.log(a.validate());
 console.log(a.err);

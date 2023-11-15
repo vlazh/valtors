@@ -1,38 +1,47 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable @typescript-eslint/ban-types */
-import { validate } from './validate';
+/* eslint-disable func-names */
 import {
-  type DefaultValidationResultProperty,
-  type ValidatableConstructor,
-  type ValidatableOptions,
   validatable as validatableFn,
+  type DefaultValidationResultProperty,
+  type ValidatableOptions,
+  type ValidatableConstructor,
 } from './validatable';
-import type { PropsValidators } from './validate';
+import { validate, type ValidateOptions } from './validate';
 import * as valtors from './validators';
 
-export type TypedPropertyDecorator<T extends AnyObject = AnyObject> = (
-  target: T,
-  key: never extends T ? string : keyof T
+export type FieldDecorator<T extends AnyObject = AnyObject> = (
+  target: undefined,
+  context: ClassFieldDecoratorContext<T>
 ) => void;
 
-type ValidatableDecorator<
-  T extends Function | ValidatableOptions<any, RP>,
+export type ClassDecorator<T extends AnyConstructor, R = void> = (
+  target: T,
+  context: ClassDecoratorContext<T>
+) => R;
+
+export function validatable<
+  T extends AnyConstructor,
+  RP extends string = DefaultValidationResultProperty,
+>(target: T, context: ClassDecoratorContext<T>): ValidatableConstructor<T, RP>;
+
+export function validatable<
+  T extends AnyConstructor,
+  O extends ValidatableOptions<never, RP>,
   RP extends string,
-> = T extends Function
-  ? ValidatableConstructor<T, DefaultValidationResultProperty>
-  : <F extends Function>(target: F) => ValidatableConstructor<F, RP>;
+>(options: O): ClassDecorator<T, ValidatableConstructor<T, RP>>;
 
-export function validatable<T extends Function | ValidatableOptions<any, RP>, RP extends string>(
-  targetOrOptions: T
-): ValidatableDecorator<T, RP> {
+export function validatable<
+  T extends AnyConstructor,
+  O extends ValidatableOptions<never, RP>,
+  RP extends string = DefaultValidationResultProperty,
+>(
+  targetOrOptions: T | O
+): ValidatableConstructor<T, RP> | ClassDecorator<T, ValidatableConstructor<T, RP>> {
   if (typeof targetOrOptions === 'function') {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    return validatableFn(targetOrOptions as Function) as ValidatableDecorator<T, RP>;
+    return validatableFn(targetOrOptions);
   }
-
-  return ((target) => {
-    return validatableFn(target, targetOrOptions) as typeof target;
-  }) as ValidatableDecorator<T, RP>;
+  return (target) => {
+    return validatableFn<T, RP>(target, targetOrOptions);
+  };
 }
 
 /**
@@ -44,72 +53,86 @@ export function addValidator<T extends AnyObject>({
   type,
   message,
 }: // order = 0,
-valtors.Validator): TypedPropertyDecorator<T> {
-  return (target, name) => {
-    const validatorsPropName = validate.getValidatorsPropName();
-    if (!(validatorsPropName in target)) {
-      Object.defineProperty(target, validatorsPropName, {
-        configurable: false,
-        enumerable: false,
-        writable: false,
-        value: {},
+valtors.Validator): FieldDecorator<T> {
+  return (_, context) => {
+    return function (this: T, value: unknown) {
+      const validatorsPropName = validate.getValidatorsPropName();
+
+      if (!(validatorsPropName in this)) {
+        Object.defineProperty(this, validatorsPropName, {
+          configurable: true, // It needs for mobx
+          enumerable: false,
+          writable: false,
+          value: {},
+        });
+      }
+
+      const validators = (this as Record<symbol, NonNullable<ValidateOptions<T>['validators']>>)[
+        validatorsPropName
+      ];
+      const fieldName = context.name as keyof typeof validators;
+      if (validators[fieldName] && !Array.isArray(validators[fieldName])) {
+        validators[fieldName] = [validators[fieldName] as valtors.Validator];
+      }
+      if (!validators[fieldName]) {
+        validators[fieldName] = [];
+      }
+      (validators[fieldName] as valtors.Validator[]).push({
+        assertion,
+        type,
+        message,
+        // order,
       });
-    }
-    const validators = target[validatorsPropName] as Writeable<PropsValidators<T>>;
-    validators[name as keyof T] = validators[name as keyof T] || [];
-    (validators[name as keyof T] as valtors.Validator[]).push({
-      assertion,
-      type,
-      message,
-      // order,
-    });
+
+      return value;
+    };
   };
 }
 
-export function compose(...decorators: TypedPropertyDecorator[]): TypedPropertyDecorator {
+export function compose(...decorators: FieldDecorator[]): FieldDecorator {
   return (target, name) => {
     decorators.forEach((v) => v(target, name));
   };
 }
 
-export function required(...args: Parameters<typeof valtors.required>): TypedPropertyDecorator {
+export function required(...args: Parameters<typeof valtors.required>): FieldDecorator {
   return addValidator(valtors.required(...args));
 }
 
-export function min(...args: Parameters<typeof valtors.min>): TypedPropertyDecorator {
+export function min(...args: Parameters<typeof valtors.min>): FieldDecorator {
   return addValidator(valtors.min(...args));
 }
 
-export function max(...args: Parameters<typeof valtors.max>): TypedPropertyDecorator {
+export function max(...args: Parameters<typeof valtors.max>): FieldDecorator {
   return addValidator(valtors.max(...args));
 }
 
-export function minLength(...args: Parameters<typeof valtors.minLength>): TypedPropertyDecorator {
+export function minLength(...args: Parameters<typeof valtors.minLength>): FieldDecorator {
   return addValidator(valtors.minLength(...args));
 }
 
-export function maxLength(...args: Parameters<typeof valtors.maxLength>): TypedPropertyDecorator {
+export function maxLength(...args: Parameters<typeof valtors.maxLength>): FieldDecorator {
   return addValidator(valtors.maxLength(...args));
 }
 
-export function match(...args: Parameters<typeof valtors.match>): TypedPropertyDecorator {
+export function match(...args: Parameters<typeof valtors.match>): FieldDecorator {
   return addValidator(valtors.match(...args));
 }
 
-export function oneOf(...args: Parameters<typeof valtors.oneOf>): TypedPropertyDecorator {
+export function oneOf(...args: Parameters<typeof valtors.oneOf>): FieldDecorator {
   return addValidator(valtors.oneOf(...args));
 }
 
-export function email(...args: Parameters<typeof valtors.email>): TypedPropertyDecorator {
+export function email(...args: Parameters<typeof valtors.email>): FieldDecorator {
   return addValidator(valtors.email(...args));
 }
 
 export function propEquals<T extends AnyObject>(
   ...args: Parameters<typeof valtors.propEquals>
-): TypedPropertyDecorator<T> {
+): FieldDecorator<T> {
   return addValidator(valtors.propEquals(...args));
 }
 
-export function dateString(...args: Parameters<typeof valtors.dateString>): TypedPropertyDecorator {
+export function dateString(...args: Parameters<typeof valtors.dateString>): FieldDecorator {
   return addValidator(valtors.dateString(...args));
 }
