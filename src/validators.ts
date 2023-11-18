@@ -22,7 +22,7 @@ export interface ValidatorConfig<A extends ValueAssertion<any> | TargetValueAsse
   readonly type: ValidatorType;
   readonly message: string | MessageBuilder<A>;
   /** Use this prop if you need to tell that the validation result is still valid but you want to return some message. */
-  readonly valid?: boolean | undefined;
+  readonly valid?: boolean;
 }
 
 export interface Validator<

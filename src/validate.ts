@@ -1,6 +1,6 @@
 import type { ValidatorConfig, Validator } from './validators';
 
-export type ValidationInfo = ExcludeTypes<ValidatorConfig<any>, AnyFunction>;
+export type ValidationInfo = Required<ExcludeTypes<ValidatorConfig<any>, AnyFunction>>;
 
 export type ValidationResult<
   Props extends PropertyKey,
@@ -31,11 +31,11 @@ export interface ValidateOptions<T extends AnyObject, K extends keyof T = never>
  * Validates all properties of the `target` or just the property `propName`.
  * If the `testValue` is provided it will be used instead of `target[propName]`
  */
-export function validate<T extends AnyObject, K extends keyof T>(
+export function validate<T extends AnyObject, K extends keyof T = keyof T>(
   target: T,
   propName?: K | undefined,
   options: ValidateOptions<T, K> = {}
-): ValidationResult<keyof T> {
+): ValidationResult<K> {
   const props = propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[]);
   const targetValidators =
     options.validators ??
@@ -60,12 +60,13 @@ export function validate<T extends AnyObject, K extends keyof T>(
 
         if (failed) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { type, message, assertion, ...rest } = failed;
+          const { type, message, assertion, valid, ...rest } = failed;
           acc[prop] = {
             message: (typeof message === 'function' ? message(propValue, target, prop) : message)
               .replace(/{PROP}/, prop.toString())
               .replace(/{VALUE}/, String(propValue)),
             type,
+            valid: valid ?? false,
             ...rest,
           } as Writeable<ValidationResult<keyof T>>[typeof prop];
         } else {
