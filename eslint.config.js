@@ -1,0 +1,11 @@
+/** @type {import('eslint').Linter.FlatConfig[]} */
+module.exports = [
+  ...require('@js-toolkit/configs/eslint/common'),
+
+  {
+    rules: {
+      'no-use-before-define': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+];
