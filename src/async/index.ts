@@ -1,10 +1,11 @@
+/* eslint-disable import/export */
 import { validate as validateSync, type ValidateOptions } from '../validate';
 
 export * from '../index';
 
 export function validate<T extends AnyObject, K extends keyof T>(
   target: T,
-  propName?: K | undefined,
+  propName?: K,
   options: ValidateOptions<T, K> = {}
 ): Promise<ReturnType<typeof validateSync>> {
   return new Promise((resolve) => {

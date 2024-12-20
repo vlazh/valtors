@@ -33,7 +33,7 @@ export interface ValidateOptions<T extends AnyObject, K extends keyof T = never>
  */
 export function validate<T extends AnyObject, K extends keyof T = keyof T>(
   target: T,
-  propName?: K | undefined,
+  propName?: K,
   options: ValidateOptions<T, K> = {}
 ): ValidationResult<K> {
   const props = propName ? [propName] : (Object.getOwnPropertyNames(target) as (keyof T)[]);
