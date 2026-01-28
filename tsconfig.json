@@ -10,8 +10,8 @@
     "diagnostics": true
   },
   "include": ["src"],
-  // "exclude": ["./src/test/**/*"],
-  "files": ["src/index.ts"],
+  "exclude": ["./src/test/**/*"],
+  // "files": ["src/index.ts"],
   "ts-node": {
     "transpileOnly": true,
     // "esm": true,
