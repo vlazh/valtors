@@ -1,73 +1,118 @@
-# Valtors [![npm package](https://img.shields.io/npm/v/valtors.svg?style=flat-square)](https://www.npmjs.org/package/valtors)
+# Valtors
 
-**Valtors** is a small flexible and extensible validation library for TypeScript/JavaScript. It provides [decorators](https://github.com/tc39/proposal-decorators) for classes and properties. Perfect worked with [MobX](https://mobx.js.org/).
+[![npm package](https://img.shields.io/npm/v/valtors.svg?style=flat-square)](https://www.npmjs.org/package/valtors)
+[![license](https://img.shields.io/npm/l/valtors.svg?style=flat-square)](https://www.npmjs.org/package/valtors)
 
-Class decorator `@validatable` injects method `validate(propName?: keyof this)` and property with validation errors (default is `validationErrors`) which will available after `validate` method will be called.
+Small, flexible, and extensible validation library for TypeScript/JavaScript. Provides [TC39 decorators](https://github.com/tc39/proposal-decorators) for classes and properties. Works great with [MobX](https://mobx.js.org/).
 
-## React + MobX + Valtors Example
+## Install
 
-```jsx
-// Store for react component
+```bash
+yarn add valtors
+# or
+npm install valtors
+```
 
-import { action, observable } from 'mobx';
-import { email, required, validatable } from 'valtors';
+## Features
 
-// @validatable without arguments injects `validationErrors` property for validation errors
-@validatable('errors')
-export default class AuthCredentialsStore {
-  @observable
+- Built-in validators: `required`, `email`, `min`, `max`, `minLength`, `maxLength`, `match`, `oneOf`, `propEquals`, `dateString`
+- Class decorator `@validatable` injects `validate()` method and validation errors property
+- Property decorators for declarative validation
+- Async validation support
+- Custom validators and error messages
+- TypeScript-first with full type safety
+
+## API Overview
+
+| Export | Description |
+|--------|-------------|
+| `required`, `email`, `min`, `max`, `minLength`, `maxLength` | Built-in validators |
+| `match`, `oneOf`, `propEquals`, `dateString` | Pattern and comparison validators |
+| `validate` | Validate an object or a single property |
+| `@validatable` | Class decorator that adds validation support |
+| Property decorators (`@required`, `@email`, etc.) | Declarative property validation |
+| `assertions` | Low-level assertion functions |
+| `messages` | Default error messages (customizable) |
+| `async/validate` | Async version of validate |
+
+## Usage
+
+### Basic validation with decorators
+
+```typescript
+import { observable, action, makeObservable } from 'mobx';
+import { validatable, required, email } from 'valtors/decorators';
+
+@validatable
+class AuthStore {
   @required()
   @email()
-  username;
+  accessor username = '';
 
-  @observable
-  @required('Password is required')
-  password;
+  @required({ message: 'Password is required' })
+  accessor password = '';
 
-  @action
-  submit() {
-    // Validate all fields.
+  constructor() {
+    makeObservable(this, {
+      username: observable,
+      password: observable,
+      submit: action,
+    });
+  }
+
+  submit(): void {
     if (!this.validate()) return;
-    // If store is valid submit.
+    // all fields valid, proceed
   }
 }
+```
 
-// React component
+### Custom validation errors property
 
-import React, { useCallback } from 'react';
-import { action } from 'mobx';
-import { observer } from 'mobx-react-lite';
-import styles from './SignIn.css';
+```typescript
+import { validatable } from 'valtors/decorators';
 
-function SignIn({ store }) {
-  const onSubmit = useCallback(action((e) => {
-    e.preventDefault();
-    store.submit();
-  }), [store]);
-
-  const onChange = useCallback(action(({ target: { name, value } }) => {
-    store[name] = value;
-    store.validate(name); // Validate only one field.
-  }), [store]);
-
-  const { errors } = store;
-
-  return (
-    <form onSubmit={onSubmit} noValidate>
-      <input value={store.username} onChange={onChange} name="username" type="email" placeholder="email">
-      <span className={errors.username.error ? styles['error'] : styles['hide']}>{errors.username.error}</span>
-
-      <input value={store.password} onChange={onChange} name="password" type="password" placeholder="password">
-      <span className={errors.password.error ? styles['error'] : styles['hide']}>{errors.password.error}</span>
-
-      <button className={styles['btn-login']} type="submit">Login</button>
-    </form>
-  );
+@validatable({ resultProperty: 'errors' })
+class FormStore {
+  // ...
+  // errors will be available as `this.errors` instead of `this.validationErrors`
 }
+```
 
-export default observer(SignIn);
+### Programmatic validation (without decorators)
+
+```typescript
+import { validate } from 'valtors';
+import { required, email, minLength } from 'valtors';
+
+const validators = {
+  username: [required(), email()],
+  password: [required(), minLength(8)],
+};
+
+const data = { username: 'test', password: '123' };
+const result = validate(data, validators);
+// result.username.error / result.password.error
+```
+
+### Custom validator
+
+```typescript
+import type { Validator, ValueAssertion } from 'valtors';
+
+function noSpaces(message = 'Must not contain spaces'): Validator<ValueAssertion<string>> {
+  return {
+    type: 'error',
+    message,
+    assertion: (value: string) => !value.includes(' '),
+  };
+}
 ```
 
 ## License
 
 [MIT](https://opensource.org/licenses/mit-license.php)
+
+## Repository
+
+[https://github.com/vlazh/valtors](https://github.com/vlazh/valtors)
